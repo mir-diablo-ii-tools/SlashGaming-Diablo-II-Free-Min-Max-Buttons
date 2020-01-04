@@ -43,53 +43,63 @@
  *  work.
  */
 
-#include "required_patches.hpp"
+#include "d2gfx_add_min_max_buttons_patch_1_09d.hpp"
 
-#include <algorithm>
+#include <array>
 
-#include "d2gdi_stretch_bitmap_patch/d2gdi_stretch_bitmap_patch.hpp"
-#include "d2gfx_add_min_max_buttons_patch/d2gfx_add_min_max_buttons_patch.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch/d2gfx_resize_window_on_resolution_change_patch.hpp"
-#include "d2win_register_on_maximize_window_patch/d2win_register_on_maximize_window_patch.hpp"
+#include "../../../asm_x86_macro.h"
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> MakeRequiredPatches() {
-  std::vector<mapi::GamePatch> game_patches;
+std::vector<mapi::GamePatch>
+Make_D2GFX_AddMinMaxButtonsPatch_1_09D() {
+  std::vector<mapi::GamePatch> patches;
 
-  std::vector d2gdi_stretch_bitmap_patch =
-      Make_D2GDI_StretchBitmapPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.begin()),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.end())
+  // Set up the window style buffer.
+  constexpr DWORD window_style = WS_CAPTION
+      | WS_SYSMENU
+      | WS_MINIMIZEBOX
+      | WS_MAXIMIZEBOX;
+
+  constexpr std::array<
+      std::uint8_t, sizeof(window_style)
+  > window_style_buffer = {
+      window_style & 0xFF,
+      (window_style >> (8 * 1)) & 0xFF,
+      (window_style >> (8 * 2)) & 0xFF,
+      (window_style >> (8 * 3)) & 0xFF,
+  };
+
+  // Create window with the min and max buttons.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x456D + 3
   );
 
-  std::vector d2gfx_add_min_max_buttons_patch =
-      Make_D2GFX_AddMinMaxButtonsPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.begin()),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.end())
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_01),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
   );
 
-  std::vector d2gfx_resize_window_on_resolution_change_patch =
-      Make_D2GFX_ResizeWindowOnResolutionChangePatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.begin()),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.end())
+  // When resolution is modified, modify window rect adjustment to include
+  // the window style.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x4BCC + 1
   );
 
-  std::vector d2win_register_on_maximize_window_patch =
-      Make_D2Win_RegisterOnMaximizeWindowPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.begin()),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.end())
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_02),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
   );
 
-  return game_patches;
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches

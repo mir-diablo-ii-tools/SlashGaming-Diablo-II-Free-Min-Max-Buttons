@@ -43,53 +43,20 @@
  *  work.
  */
 
-#include "required_patches.hpp"
+#include "d2gfx_add_min_max_buttons_patch.hpp"
 
-#include <algorithm>
-
-#include "d2gdi_stretch_bitmap_patch/d2gdi_stretch_bitmap_patch.hpp"
-#include "d2gfx_add_min_max_buttons_patch/d2gfx_add_min_max_buttons_patch.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch/d2gfx_resize_window_on_resolution_change_patch.hpp"
-#include "d2win_register_on_maximize_window_patch/d2win_register_on_maximize_window_patch.hpp"
+#include "d2gfx_add_min_max_buttons_patch_1_09d.hpp"
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> MakeRequiredPatches() {
-  std::vector<mapi::GamePatch> game_patches;
+std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
+  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
 
-  std::vector d2gdi_stretch_bitmap_patch =
-      Make_D2GDI_StretchBitmapPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.begin()),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.end())
-  );
-
-  std::vector d2gfx_add_min_max_buttons_patch =
-      Make_D2GFX_AddMinMaxButtonsPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.begin()),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.end())
-  );
-
-  std::vector d2gfx_resize_window_on_resolution_change_patch =
-      Make_D2GFX_ResizeWindowOnResolutionChangePatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.begin()),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.end())
-  );
-
-  std::vector d2win_register_on_maximize_window_patch =
-      Make_D2Win_RegisterOnMaximizeWindowPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.begin()),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.end())
-  );
-
-  return game_patches;
+  switch (running_game_version_id) {
+    case d2::GameVersion::k1_09D: {
+      return Make_D2GFX_AddMinMaxButtonsPatch_1_09D();
+    }
+  }
 }
 
 } // namespace sgd2fmmb::patches

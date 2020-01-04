@@ -43,53 +43,17 @@
  *  work.
  */
 
-#include "required_patches.hpp"
+#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_HPP_
+#define SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_HPP_
 
-#include <algorithm>
+#include <vector>
 
-#include "d2gdi_stretch_bitmap_patch/d2gdi_stretch_bitmap_patch.hpp"
-#include "d2gfx_add_min_max_buttons_patch/d2gfx_add_min_max_buttons_patch.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch/d2gfx_resize_window_on_resolution_change_patch.hpp"
-#include "d2win_register_on_maximize_window_patch/d2win_register_on_maximize_window_patch.hpp"
+#include <sgd2mapi.hpp>
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> MakeRequiredPatches() {
-  std::vector<mapi::GamePatch> game_patches;
-
-  std::vector d2gdi_stretch_bitmap_patch =
-      Make_D2GDI_StretchBitmapPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.begin()),
-      std::make_move_iterator(d2gdi_stretch_bitmap_patch.end())
-  );
-
-  std::vector d2gfx_add_min_max_buttons_patch =
-      Make_D2GFX_AddMinMaxButtonsPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.begin()),
-      std::make_move_iterator(d2gfx_add_min_max_buttons_patch.end())
-  );
-
-  std::vector d2gfx_resize_window_on_resolution_change_patch =
-      Make_D2GFX_ResizeWindowOnResolutionChangePatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.begin()),
-      std::make_move_iterator(d2gfx_resize_window_on_resolution_change_patch.end())
-  );
-
-  std::vector d2win_register_on_maximize_window_patch =
-      Make_D2Win_RegisterOnMaximizeWindowPatch();
-  game_patches.insert(
-      game_patches.end(),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.begin()),
-      std::make_move_iterator(d2win_register_on_maximize_window_patch.end())
-  );
-
-  return game_patches;
-}
+std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch();
 
 } // namespace sgd2fmmb::patches
+
+#endif // SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_HPP_
