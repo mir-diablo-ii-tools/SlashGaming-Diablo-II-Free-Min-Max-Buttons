@@ -89,7 +89,7 @@ std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch_1_09D() {
       mapi::GamePatch::MakeGameBranchPatch(
           std::move(game_address_01),
           mapi::BranchType::kCall,
-          InterceptionFunc_01,
+          &InterceptionFunc_01,
           0x1403 - 0x13FD
       )
   );

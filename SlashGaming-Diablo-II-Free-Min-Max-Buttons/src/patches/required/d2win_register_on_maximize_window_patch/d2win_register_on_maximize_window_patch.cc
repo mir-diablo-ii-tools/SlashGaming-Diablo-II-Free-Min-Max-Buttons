@@ -45,6 +45,7 @@
 
 #include "d2win_register_on_maximize_window_patch.hpp"
 
+#include "d2win_register_on_maximize_window_patch_1_00.hpp"
 #include "d2win_register_on_maximize_window_patch_1_09d.hpp"
 
 namespace sgd2fmmb::patches {
@@ -53,6 +54,10 @@ std::vector<mapi::GamePatch> Make_D2Win_RegisterOnMaximizeWindowPatch() {
   d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
 
   switch (running_game_version_id) {
+    case d2::GameVersion::k1_00: {
+      return Make_D2Win_RegisterOnMaximizeWindowPatch_1_00();
+    }
+
     case d2::GameVersion::k1_09D: {
       return Make_D2Win_RegisterOnMaximizeWindowPatch_1_09D();
     }

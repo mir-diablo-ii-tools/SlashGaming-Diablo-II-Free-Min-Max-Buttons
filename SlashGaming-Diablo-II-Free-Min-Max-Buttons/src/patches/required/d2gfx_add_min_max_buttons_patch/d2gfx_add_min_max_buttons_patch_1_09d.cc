@@ -48,6 +48,7 @@
 #include <array>
 
 #include "../../../asm_x86_macro.h"
+#include "../../../helper/window_style.hpp"
 
 namespace sgd2fmmb::patches {
 
@@ -56,14 +57,9 @@ Make_D2GFX_AddMinMaxButtonsPatch_1_09D() {
   std::vector<mapi::GamePatch> patches;
 
   // Set up the window style buffer.
-  constexpr DWORD window_style = WS_CAPTION
-      | WS_SYSMENU
-      | WS_MINIMIZEBOX
-      | WS_MAXIMIZEBOX;
+  DWORD window_style = GetWindowStyle();
 
-  constexpr std::array<
-      std::uint8_t, sizeof(window_style)
-  > window_style_buffer = {
+  std::array<std::uint8_t, sizeof(window_style)> window_style_buffer = {
       window_style & 0xFF,
       (window_style >> (8 * 1)) & 0xFF,
       (window_style >> (8 * 2)) & 0xFF,

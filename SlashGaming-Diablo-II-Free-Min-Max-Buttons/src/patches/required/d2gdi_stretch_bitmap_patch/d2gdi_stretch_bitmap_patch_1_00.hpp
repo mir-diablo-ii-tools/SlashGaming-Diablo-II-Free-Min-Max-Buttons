@@ -43,25 +43,17 @@
  *  work.
  */
 
-#include "d2gdi_stretch_bitmap_patch.hpp"
+#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_00_HPP_
+#define SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_00_HPP_
 
-#include "d2gdi_stretch_bitmap_patch_1_00.hpp"
-#include "d2gdi_stretch_bitmap_patch_1_09d.hpp"
+#include <vector>
+
+#include <sgd2mapi.hpp>
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch_1_00();
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GDI_StretchBitmapPatch_1_00();
-    }
+} // namespace SGD2FMMB::patches
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GDI_StretchBitmapPatch_1_09D();
-    }
-  }
-}
-
-} // namespace sgd2fmmb::patches
+#endif // SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_00_HPP_

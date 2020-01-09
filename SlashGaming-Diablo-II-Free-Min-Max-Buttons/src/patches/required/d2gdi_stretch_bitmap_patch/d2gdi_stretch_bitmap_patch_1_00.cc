@@ -43,25 +43,58 @@
  *  work.
  */
 
-#include "d2gdi_stretch_bitmap_patch.hpp"
-
 #include "d2gdi_stretch_bitmap_patch_1_00.hpp"
-#include "d2gdi_stretch_bitmap_patch_1_09d.hpp"
+
+#include "../../../asm_x86_macro.h"
+#include "d2gdi_stretch_bitmap.hpp"
 
 namespace sgd2fmmb::patches {
+namespace {
 
-std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+__declspec(naked) void __cdecl InterceptionFunc_01() {
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GDI_StretchBitmapPatch_1_00();
-    }
+  ASM_X86(push eax);
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GDI_StretchBitmapPatch_1_09D();
-    }
-  }
+  ASM_X86(push dword ptr [ebp + 24]);
+  ASM_X86(push dword ptr [ebp + 20]);
+  ASM_X86(push dword ptr [ebp + 28]);
+  ASM_X86(push dword ptr [ebp + 8]);
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2GDI_StretchBitmap));
+  ASM_X86(add esp, 16);
+
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
+  ASM_X86(pop eax);
+
+  ASM_X86(leave);
+  ASM_X86(ret 36);
+}
+
+} // namespace
+
+std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch_1_00() {
+  std::vector<mapi::GamePatch> patches;
+
+  // Stretch the bitmap to the screen.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GDI,
+      0x181D
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_01),
+          mapi::BranchType::kCall,
+          &InterceptionFunc_01,
+          0x1823 - 0x181D
+      )
+  );
+
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches
