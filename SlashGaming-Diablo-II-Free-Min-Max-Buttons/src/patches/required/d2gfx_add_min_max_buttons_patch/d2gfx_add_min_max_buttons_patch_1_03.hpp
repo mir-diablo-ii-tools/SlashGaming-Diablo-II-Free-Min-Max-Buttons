@@ -43,26 +43,17 @@
  *  work.
  */
 
-#include "d2gdi_stretch_bitmap_patch.hpp"
+#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
+#define SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
 
-#include "d2gdi_stretch_bitmap_patch_1_00.hpp"
-#include "d2gdi_stretch_bitmap_patch_1_09d.hpp"
+#include <vector>
+
+#include <sgd2mapi.hpp>
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch_1_03();
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00:
-    case d2::GameVersion::k1_03: {
-      return Make_D2GDI_StretchBitmapPatch_1_00();
-    }
+} // namespace SGD2FMMB::patches
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GDI_StretchBitmapPatch_1_09D();
-    }
-  }
-}
-
-} // namespace sgd2fmmb::patches
+#endif // SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
