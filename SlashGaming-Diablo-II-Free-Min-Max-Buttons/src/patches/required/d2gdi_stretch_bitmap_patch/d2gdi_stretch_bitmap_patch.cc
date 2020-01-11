@@ -64,7 +64,8 @@ std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
       return Make_D2GDI_StretchBitmapPatch_1_05B();
     }
 
-    case d2::GameVersion::k1_09D: {
+    case d2::GameVersion::k1_09D:
+    case d2::GameVersion::k1_10: {
       return Make_D2GDI_StretchBitmapPatch_1_09D();
     }
   }
