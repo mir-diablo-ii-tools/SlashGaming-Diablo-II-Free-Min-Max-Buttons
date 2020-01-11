@@ -43,37 +43,17 @@
  *  work.
  */
 
-#include "d2gfx_add_min_max_buttons_patch.hpp"
+#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_04B_HPP_
+#define SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_04B_HPP_
 
-#include "d2gfx_add_min_max_buttons_patch_1_00.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_01.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_04b.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_09d.hpp"
+#include <vector>
+
+#include <sgd2mapi.hpp>
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch_1_04B();
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_00();
-    }
+} // namespace SGD2FMMB::patches
 
-    case d2::GameVersion::k1_01:
-    case d2::GameVersion::k1_02:
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_01();
-    }
-
-    case d2::GameVersion::k1_04B_C: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_04B();
-    }
-
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_09D();
-    }
-  }
-}
-
-} // namespace sgd2fmmb::patches
+#endif // SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_04B_HPP_
