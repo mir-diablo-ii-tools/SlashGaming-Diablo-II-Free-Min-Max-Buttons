@@ -66,7 +66,9 @@ std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
       return Make_D2GFX_AddMinMaxButtonsPatch_1_01();
     }
 
-    case d2::GameVersion::k1_04B_C: {
+    case d2::GameVersion::k1_04B_C:
+    case d2::GameVersion::k1_05:
+    case d2::GameVersion::k1_05B: {
       return Make_D2GFX_AddMinMaxButtonsPatch_1_04B();
     }
 
