@@ -43,51 +43,58 @@
  *  work.
  */
 
-#include "d2gfx_add_min_max_buttons_patch.hpp"
-
-#include "d2gfx_add_min_max_buttons_patch_1_00.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_01.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_04b.hpp"
 #include "d2gfx_add_min_max_buttons_patch_1_07.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_07_beta.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_09d.hpp"
+
+#include <array>
+
+#include "../../../asm_x86_macro.h"
+#include "../../../helper/window_style.hpp"
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch>
+Make_D2GFX_AddMinMaxButtonsPatch_1_07() {
+  std::vector<mapi::GamePatch> patches;
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_00();
-    }
+  // Set up the window style buffer.
+  DWORD window_style = GetWindowStyle();
+  std::array<std::uint8_t, sizeof(window_style)> window_style_buffer = {
+      window_style & 0xFF,
+      (window_style >> (8 * 1)) & 0xFF,
+      (window_style >> (8 * 2)) & 0xFF,
+      (window_style >> (8 * 3)) & 0xFF,
+  };
 
-    case d2::GameVersion::k1_01:
-    case d2::GameVersion::k1_02:
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_01();
-    }
+  // Create window with the min and max buttons.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x4550 + 3
+  );
 
-    case d2::GameVersion::k1_04B_C:
-    case d2::GameVersion::k1_05:
-    case d2::GameVersion::k1_05B:
-    case d2::GameVersion::k1_06:
-    case d2::GameVersion::k1_06B: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_04B();
-    }
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_01),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
 
-    case d2::GameVersion::k1_07Beta: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_07Beta();
-    }
+  // When resolution is modified, modify window rect adjustment to include
+  // the window style.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x4BAC + 1
+  );
 
-    case d2::GameVersion::k1_07: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_07();
-    }
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_02),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_09D();
-    }
-  }
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches
