@@ -47,6 +47,7 @@
 
 #include "d2gfx_resize_window_on_resolution_change_patch_1_00.hpp"
 #include "d2gfx_resize_window_on_resolution_change_patch_1_03.hpp"
+#include "d2gfx_resize_window_on_resolution_change_patch_1_05b.hpp"
 #include "d2gfx_resize_window_on_resolution_change_patch_1_09d.hpp"
 
 namespace sgd2fmmb::patches {
@@ -61,6 +62,10 @@ std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
 
     case d2::GameVersion::k1_03: {
       return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_03();
+    }
+
+    case d2::GameVersion::k1_05B: {
+      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_05B();
     }
 
     case d2::GameVersion::k1_09D: {

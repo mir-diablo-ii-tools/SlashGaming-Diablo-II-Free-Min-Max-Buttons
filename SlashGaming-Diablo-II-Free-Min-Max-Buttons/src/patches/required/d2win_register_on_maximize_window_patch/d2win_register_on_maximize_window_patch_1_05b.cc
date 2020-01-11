@@ -43,31 +43,94 @@
  *  work.
  */
 
-#include "d2gdi_stretch_bitmap_patch.hpp"
+#include "d2win_register_on_maximize_window_patch_1_05b.hpp"
 
-#include "d2gdi_stretch_bitmap_patch_1_00.hpp"
-#include "d2gdi_stretch_bitmap_patch_1_05b.hpp"
-#include "d2gdi_stretch_bitmap_patch_1_09d.hpp"
+#include "../../../asm_x86_macro.h"
+#include "d2win_register_on_maximize_window.hpp"
 
 namespace sgd2fmmb::patches {
+namespace {
 
-std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+__declspec(naked) void __cdecl InterceptionFunc_01() {
+  // Original code.
+  ASM_X86(pop edi);
+  ASM_X86(pop ebx);
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00:
-    case d2::GameVersion::k1_03: {
-      return Make_D2GDI_StretchBitmapPatch_1_00();
-    }
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
 
-    case d2::GameVersion::k1_05B: {
-      return Make_D2GDI_StretchBitmapPatch_1_05B();
-    }
+  ASM_X86(push eax);
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GDI_StretchBitmapPatch_1_09D();
-    }
-  }
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2Win_RegisterResizeEvent));
+
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
+  ASM_X86(pop eax);
+
+  ASM_X86(leave);
+  ASM_X86(ret 4);
+}
+
+__declspec(naked) void __cdecl InterceptionFunc_02() {
+  // Original code.
+  ASM_X86(pop edi);
+  ASM_X86(pop ebx);
+
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
+
+  ASM_X86(push eax);
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
+
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2Win_UnregisterResizeEvent));
+
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
+  ASM_X86(pop eax);
+
+  ASM_X86(leave);
+  ASM_X86(ret 4);
+}
+
+} // namespace
+
+std::vector<mapi::GamePatch> Make_D2Win_RegisterOnMaximizeWindowPatch_1_05B() {
+  std::vector<mapi::GamePatch> patches;
+
+  // Register screen maximize event.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2Win,
+      0x10207
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_01),
+          mapi::BranchType::kJump,
+          &InterceptionFunc_01,
+          0x1020C - 0x10207
+      )
+  );
+
+  // Unregister screen maximize event.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2Win,
+      0x10257
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_02),
+          mapi::BranchType::kJump,
+          &InterceptionFunc_02,
+          0x1025C - 0x10257
+      )
+  );
+
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches
