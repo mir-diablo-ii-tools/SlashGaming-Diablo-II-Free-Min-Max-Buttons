@@ -73,6 +73,10 @@ std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
     case d2::GameVersion::k1_12A: {
       return Make_D2GDI_StretchBitmapPatch_1_12A();
     }
+
+    default: {
+      return {};
+    }
   }
 }
 

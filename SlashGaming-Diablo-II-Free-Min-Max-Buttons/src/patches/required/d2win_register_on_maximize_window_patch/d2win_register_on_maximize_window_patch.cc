@@ -81,6 +81,10 @@ std::vector<mapi::GamePatch> Make_D2Win_RegisterOnMaximizeWindowPatch() {
     case d2::GameVersion::k1_12A: {
       return Make_D2Win_RegisterOnMaximizeWindowPatch_1_12A();
     }
+
+    default: {
+      return {};
+    }
   }
 }
 

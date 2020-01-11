@@ -116,6 +116,11 @@ std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
     case d2::GameVersion::k1_12A: {
       return Make_D2GFX_AddMinMaxButtonsPatch_1_12A();
     }
+
+    default: {
+      // Versions 1.13A PTR and above have Min and Max buttons.
+      return {};
+    }
   }
 }
 

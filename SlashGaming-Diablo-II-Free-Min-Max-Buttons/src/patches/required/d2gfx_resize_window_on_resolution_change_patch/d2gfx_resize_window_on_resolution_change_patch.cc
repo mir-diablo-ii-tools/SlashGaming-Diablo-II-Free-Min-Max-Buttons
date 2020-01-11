@@ -81,6 +81,10 @@ std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
     case d2::GameVersion::k1_12A: {
       return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A();
     }
+
+    default: {
+      return {};
+    }
   }
 }
 
