@@ -46,7 +46,7 @@
 #include "d2gfx_add_min_max_buttons_patch.hpp"
 
 #include "d2gfx_add_min_max_buttons_patch_1_00.hpp"
-#include "d2gfx_add_min_max_buttons_patch_1_03.hpp"
+#include "d2gfx_add_min_max_buttons_patch_1_01.hpp"
 #include "d2gfx_add_min_max_buttons_patch_1_09d.hpp"
 
 namespace sgd2fmmb::patches {
@@ -59,8 +59,10 @@ std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch() {
       return Make_D2GFX_AddMinMaxButtonsPatch_1_00();
     }
 
+    case d2::GameVersion::k1_01:
+    case d2::GameVersion::k1_02:
     case d2::GameVersion::k1_03: {
-      return Make_D2GFX_AddMinMaxButtonsPatch_1_03();
+      return Make_D2GFX_AddMinMaxButtonsPatch_1_01();
     }
 
     case d2::GameVersion::k1_09D: {

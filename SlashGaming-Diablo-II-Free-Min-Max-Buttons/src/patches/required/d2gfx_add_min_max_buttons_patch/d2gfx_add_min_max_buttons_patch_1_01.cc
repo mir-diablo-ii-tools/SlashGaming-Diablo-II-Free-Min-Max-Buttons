@@ -43,17 +43,58 @@
  *  work.
  */
 
-#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
-#define SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
+#include "d2gfx_add_min_max_buttons_patch_1_01.hpp"
 
-#include <vector>
+#include <array>
 
-#include <sgd2mapi.hpp>
+#include "../../../asm_x86_macro.h"
+#include "../../../helper/window_style.hpp"
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GFX_AddMinMaxButtonsPatch_1_03();
+std::vector<mapi::GamePatch>
+Make_D2GFX_AddMinMaxButtonsPatch_1_01() {
+  std::vector<mapi::GamePatch> patches;
 
-} // namespace SGD2FMMB::patches
+  // Set up the window style buffer.
+  DWORD window_style = GetWindowStyle();
+  std::array<std::uint8_t, sizeof(window_style)> window_style_buffer = {
+      window_style & 0xFF,
+      (window_style >> (8 * 1)) & 0xFF,
+      (window_style >> (8 * 2)) & 0xFF,
+      (window_style >> (8 * 3)) & 0xFF,
+  };
 
-#endif // SGD2FMMB_PATCHES_REQUIRED_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_D2GFX_ADD_MIN_MAX_BUTTONS_PATCH_1_03_HPP_
+  // Create window with the min and max buttons.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x5983 + 3
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_01),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
+
+  // When resolution is modified, modify window rect adjustment to include
+  // the window style.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x6128 + 1
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_02),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
+
+  return patches;
+}
+
+} // namespace sgd2fmmb::patches
