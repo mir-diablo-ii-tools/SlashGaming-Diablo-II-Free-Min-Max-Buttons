@@ -48,6 +48,7 @@
 #include "d2gdi_stretch_bitmap_patch_1_00.hpp"
 #include "d2gdi_stretch_bitmap_patch_1_05b.hpp"
 #include "d2gdi_stretch_bitmap_patch_1_09d.hpp"
+#include "d2gdi_stretch_bitmap_patch_1_12a.hpp"
 
 namespace sgd2fmmb::patches {
 
@@ -67,6 +68,10 @@ std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch() {
     case d2::GameVersion::k1_09D:
     case d2::GameVersion::k1_10: {
       return Make_D2GDI_StretchBitmapPatch_1_09D();
+    }
+
+    case d2::GameVersion::k1_12A: {
+      return Make_D2GDI_StretchBitmapPatch_1_12A();
     }
   }
 }

@@ -43,45 +43,17 @@
  *  work.
  */
 
-#include "d2gfx_resize_window_on_resolution_change_patch.hpp"
+#ifndef SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_12A_HPP_
+#define SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_12A_HPP_
 
-#include "d2gfx_resize_window_on_resolution_change_patch_1_00.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_03.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_05b.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_09d.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_10.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_12a.hpp"
+#include <vector>
+
+#include <sgd2mapi.hpp>
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch> Make_D2GDI_StretchBitmapPatch_1_12A();
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_00();
-    }
+} // namespace SGD2FMMB::patches
 
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_03();
-    }
-
-    case d2::GameVersion::k1_05B: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_05B();
-    }
-
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_09D();
-    }
-
-    case d2::GameVersion::k1_10: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_10();
-    }
-
-    case d2::GameVersion::k1_12A: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A();
-    }
-  }
-}
-
-} // namespace sgd2fmmb::patches
+#endif // SGD2FMMB_PATCHES_REQUIRED_D2GDI_STRETCH_BITMAP_PATCH_D2GDI_STRETCH_BITMAP_PATCH_1_12A_HPP_

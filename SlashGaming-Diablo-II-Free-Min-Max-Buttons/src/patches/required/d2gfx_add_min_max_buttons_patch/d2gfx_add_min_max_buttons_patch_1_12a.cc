@@ -43,45 +43,58 @@
  *  work.
  */
 
-#include "d2gfx_resize_window_on_resolution_change_patch.hpp"
+#include "d2gfx_add_min_max_buttons_patch_1_12a.hpp"
 
-#include "d2gfx_resize_window_on_resolution_change_patch_1_00.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_03.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_05b.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_09d.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_10.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_12a.hpp"
+#include <array>
+
+#include "../../../asm_x86_macro.h"
+#include "../../../helper/window_style.hpp"
 
 namespace sgd2fmmb::patches {
 
-std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+std::vector<mapi::GamePatch>
+Make_D2GFX_AddMinMaxButtonsPatch_1_12A() {
+  std::vector<mapi::GamePatch> patches;
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_00();
-    }
+  // Set up the window style buffer.
+  DWORD window_style = GetWindowStyle();
+  std::array<std::uint8_t, sizeof(window_style)> window_style_buffer = {
+      window_style & 0xFF,
+      (window_style >> (8 * 1)) & 0xFF,
+      (window_style >> (8 * 2)) & 0xFF,
+      (window_style >> (8 * 3)) & 0xFF,
+  };
 
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_03();
-    }
+  // Create window with the min and max buttons.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x8A0B + 4
+  );
 
-    case d2::GameVersion::k1_05B: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_05B();
-    }
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_01),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_09D();
-    }
+  // When resolution is modified, modify window rect adjustment to include
+  // the window style.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x86EB + 1
+  );
 
-    case d2::GameVersion::k1_10: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_10();
-    }
+  patches.push_back(
+      mapi::GamePatch::MakeGameBufferPatch(
+          std::move(game_address_02),
+          window_style_buffer.cbegin(),
+          window_style_buffer.cend()
+      )
+  );
 
-    case d2::GameVersion::k1_12A: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A();
-    }
-  }
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches

@@ -43,45 +43,60 @@
  *  work.
  */
 
-#include "d2gfx_resize_window_on_resolution_change_patch.hpp"
-
-#include "d2gfx_resize_window_on_resolution_change_patch_1_00.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_03.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_05b.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_09d.hpp"
 #include "d2gfx_resize_window_on_resolution_change_patch_1_10.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_12a.hpp"
+
+#include "../../../asm_x86_macro.h"
+#include "d2gfx_resize_window_on_resolution_change.hpp"
 
 namespace sgd2fmmb::patches {
+namespace {
 
-std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+__declspec(naked) void __cdecl InterceptionFunc_01() {
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_00();
-    }
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
 
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_03();
-    }
+  ASM_X86(push dword ptr [ebp + 32]);
+  ASM_X86(push dword ptr [ebp + 28]);
+  ASM_X86(push dword ptr [ebp + 24]);
+  ASM_X86(push dword ptr [ebp + 20]);
+  ASM_X86(push dword ptr [ebp + 16]);
+  ASM_X86(push dword ptr [ebp + 12]);
+  ASM_X86(push dword ptr [ebp + 8]);
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2GFX_ResizeWindowOnResolutionChange));
+  ASM_X86(add esp, 28);
 
-    case d2::GameVersion::k1_05B: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_05B();
-    }
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_09D();
-    }
+  ASM_X86(leave);
+  ASM_X86(ret 28);
+}
 
-    case d2::GameVersion::k1_10: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_10();
-    }
+} // namespace
 
-    case d2::GameVersion::k1_12A: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A();
-    }
-  }
+std::vector<mapi::GamePatch>
+Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A() {
+  std::vector<mapi::GamePatch> patches;
+
+  // Prevent screen reset on resolution change.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2GFX,
+      0x8746
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_01),
+          mapi::BranchType::kCall,
+          &InterceptionFunc_01,
+          0x874C - 0x8746
+      )
+  );
+
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches

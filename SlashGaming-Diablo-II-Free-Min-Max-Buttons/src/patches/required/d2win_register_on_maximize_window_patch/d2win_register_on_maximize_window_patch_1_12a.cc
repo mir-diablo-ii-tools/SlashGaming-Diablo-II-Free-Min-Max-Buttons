@@ -43,45 +43,92 @@
  *  work.
  */
 
-#include "d2gfx_resize_window_on_resolution_change_patch.hpp"
+#include "d2win_register_on_maximize_window_patch_1_12a.hpp"
 
-#include "d2gfx_resize_window_on_resolution_change_patch_1_00.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_03.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_05b.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_09d.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_10.hpp"
-#include "d2gfx_resize_window_on_resolution_change_patch_1_12a.hpp"
+#include "../../../asm_x86_macro.h"
+#include "d2win_register_on_maximize_window.hpp"
 
 namespace sgd2fmmb::patches {
+namespace {
 
-std::vector<mapi::GamePatch> Make_D2GFX_ResizeWindowOnResolutionChangePatch() {
-  d2::GameVersion running_game_version_id = d2::GetRunningGameVersionId();
+__declspec(naked) void __cdecl InterceptionFunc_01() {
+  // Original code.
+  ASM_X86(mov eax, 1);
 
-  switch (running_game_version_id) {
-    case d2::GameVersion::k1_00: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_00();
-    }
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
 
-    case d2::GameVersion::k1_03: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_03();
-    }
+  ASM_X86(push eax);
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
 
-    case d2::GameVersion::k1_05B: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_05B();
-    }
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2Win_RegisterResizeEvent));
 
-    case d2::GameVersion::k1_09D: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_09D();
-    }
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
+  ASM_X86(pop eax);
 
-    case d2::GameVersion::k1_10: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_10();
-    }
+  ASM_X86(leave);
+  ASM_X86(ret);
+}
 
-    case d2::GameVersion::k1_12A: {
-      return Make_D2GFX_ResizeWindowOnResolutionChangePatch_1_12A();
-    }
-  }
+__declspec(naked) void __cdecl InterceptionFunc_02() {
+  // Original code.
+  ASM_X86(mov eax, 1);
+
+  ASM_X86(push ebp);
+  ASM_X86(mov ebp, esp);
+
+  ASM_X86(push eax);
+  ASM_X86(push ecx);
+  ASM_X86(push edx);
+
+  ASM_X86(call ASM_X86_FUNC(SGD2FMMB_D2Win_UnregisterResizeEvent));
+
+  ASM_X86(pop edx);
+  ASM_X86(pop ecx);
+  ASM_X86(pop eax);
+
+  ASM_X86(leave);
+  ASM_X86(ret);
+}
+
+} // namespace
+
+std::vector<mapi::GamePatch> Make_D2Win_RegisterOnMaximizeWindowPatch_1_12A() {
+  std::vector<mapi::GamePatch> patches;
+
+  // Register screen maximize event.
+  mapi::GameAddress game_address_01 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2Win,
+      0xD488
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_01),
+          mapi::BranchType::kCall,
+          &InterceptionFunc_01,
+          0xD48D - 0xD488
+      )
+  );
+
+  // Unregister screen maximize event.
+  mapi::GameAddress game_address_02 = mapi::GameAddress::FromOffset(
+      mapi::DefaultLibrary::kD2Win,
+      0xD1C7
+  );
+
+  patches.push_back(
+      mapi::GamePatch::MakeGameBranchPatch(
+          std::move(game_address_02),
+          mapi::BranchType::kCall,
+          &InterceptionFunc_02,
+          0xD1CC - 0xD1C7
+      )
+  );
+
+  return patches;
 }
 
 } // namespace sgd2fmmb::patches
