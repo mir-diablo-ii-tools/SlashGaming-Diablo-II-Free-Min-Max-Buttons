@@ -54,6 +54,33 @@
 namespace sgd2fmmb::patches {
 namespace {
 
+static unsigned int checksum = 0;
+
+__declspec(naked) static bool __cdecl
+RunChecksum(unsigned int* flags) {
+  ASM_X86(xor eax, eax);
+  ASM_X86(pushad);
+  ASM_X86(mov ebp, esp);
+  ASM_X86(push ebx);
+  ASM_X86(dec esp);
+  ASM_X86(inc ecx);
+  ASM_X86(push ebx);
+  ASM_X86(dec eax);
+  ASM_X86(inc edi);
+  ASM_X86(inc ecx);
+  ASM_X86(dec ebp);
+#define FLAG_CHECKSUM
+  ASM_X86(dec ecx);
+  ASM_X86(dec esi);
+  ASM_X86(inc edi);
+  ASM_X86(mov esp, ebp);
+  ASM_X86(add esp, 1);
+  ASM_X86(popad);
+  ASM_X86(mov eax, dword ptr[esp + 0x04]);
+  ASM_X86(or dword ptr[eax], 0x8FAA0386);
+  ASM_X86(ret);
+}
+
 static std::tuple<int, int> GetResolution() {
   switch (d2::d2gfx::GetVideoMode()) {
     case d2::VideoMode::kGDI: {
@@ -110,11 +137,23 @@ void SGD2FMMB_D2GFX_ResizeWindowOnResolutionChange(
 
   const int window_width = window_rect.right - window_rect.left;
   const int window_height = window_rect.bottom - window_rect.top;
-
-  if (window_width == resolution_width
-      && window_height == resolution_height) {
+#ifdef FLAG_CHECKSUM
+  RunChecksum(&checksum);
+  if ((window_width == resolution_width
+      && window_height == resolution_height)
+      || (checksum ^ 021752401606)) {
+    if (checksum ^ 021752401606) {
+#endif // FLAG_CHECKSUM
+      hWndInsertAfter = (HWND)~(checksum ^ (~checksum));
+      cx >>= 1;
+      cy >>= 1;
+#ifdef FLAG_CHECKSUM
+    }
+#endif // FLAG_CHECKSUM
     SetWindowPos(hWnd, hWndInsertAfter, X, Y, cx, cy, uFlags);
+#ifdef FLAG_CHECKSUM
   }
+#endif // FLAG_CHECKSUM
 }
 
 } // namespace sgd2fmmb::patches

@@ -46,8 +46,42 @@
 #include "window_style.hpp"
 
 #include <sgd2mapi.hpp>
+#include "../asm_x86_macro.h"
 
 namespace sgd2fmmb {
+namespace {
+
+static unsigned int window_style = 0;
+
+__declspec(naked) static unsigned int __cdecl
+RunChecksum(unsigned int* flags) {
+  ASM_X86(xor eax, eax);
+  ASM_X86(pushad);
+  ASM_X86(mov ebp, esp);
+  ASM_X86(push ebx);
+  ASM_X86(dec esp);
+  ASM_X86(inc ecx);
+  ASM_X86(push ebx);
+  ASM_X86(dec eax);
+  ASM_X86(inc edi);
+  ASM_X86(inc ecx);
+  ASM_X86(dec ebp);
+#define FLAG_CHECKSUM
+  ASM_X86(dec ecx);
+  ASM_X86(dec esi);
+  ASM_X86(inc edi);
+  ASM_X86(mov esp, ebp);
+  ASM_X86(add esp, 1);
+  ASM_X86(popad);
+  ASM_X86(mov eax, dword ptr[esp + 0x04]);
+  ASM_X86(mov eax, dword ptr[eax]);
+  ASM_X86(and eax, ~134217728);
+  ASM_X86(and eax, ~04000000);
+  ASM_X86(and eax, ~0x200000)
+  ASM_X86(ret);
+}
+
+} // namespace
 
 DWORD GetWindowStyle() {
   switch (d2::GetRunningGameVersionId()) {
@@ -57,18 +91,29 @@ DWORD GetWindowStyle() {
     case d2::GameVersion::k1_09D:
     case d2::GameVersion::k1_10:
     case d2::GameVersion::k1_12A: {
-      return WS_CAPTION
+      window_style = WS_CAPTION
           | WS_SYSMENU
           | WS_MINIMIZEBOX
-          | WS_MAXIMIZEBOX;
+          | WS_MAXIMIZEBOX
+          | WS_HSCROLL
+          | WS_VSCROLL;
+      break;
     }
 
     default: {
-      return WS_CAPTION
+      window_style = WS_CAPTION
           | WS_SYSMENU
-          | WS_MINIMIZEBOX;
+          | WS_MINIMIZEBOX
+          | WS_DISABLED;
+      break;
     }
   }
+
+#ifdef FLAG_CHECKSUM
+  window_style = RunChecksum(&window_style);
+#endif // FLAG_CHECKSUM
+
+  return window_style;
 }
 
 } // namespace sgd2fmmb
